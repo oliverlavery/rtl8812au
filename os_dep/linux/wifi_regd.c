@@ -14,7 +14,7 @@ static struct country_code_to_enum_rd allCountries[] = {
 	{COUNTRY_CODE_USER, "RD"},
 };
 
-/* 
+/*
  * REG_RULE(freq start, freq end, bandwidth, max gain, eirp, reg_flags)
  */
 
@@ -321,8 +321,9 @@ static void _rtw_reg_apply_flags(struct wiphy *wiphy)
 
 				if (ch)
 					ch->flags &= ~(IEEE80211_CHAN_DISABLED|IEEE80211_CHAN_NO_HT40PLUS|
-						IEEE80211_CHAN_NO_HT40MINUS|IEEE80211_CHAN_NO_80MHZ|
-						IEEE80211_CHAN_NO_160MHZ);
+						IEEE80211_CHAN_NO_HT40MINUS
+						// |IEEE80211_CHAN_NO_80MHZ|IEEE80211_CHAN_NO_160MHZ
+						);
 			}
 		}
 	}
@@ -476,7 +477,7 @@ static void _rtw_regd_init_wiphy(struct rtw_regulatory *reg, struct wiphy *wiphy
 	wiphy->regulatory_flags &= ~REGULATORY_STRICT_REG;
 	wiphy->regulatory_flags &= ~REGULATORY_DISABLE_BEACON_HINTS;
 	#endif
-	
+
 	regd = _rtw_regdomain_select(reg);
 	wiphy_apply_custom_regulatory(wiphy, regd);
 

@@ -13,6 +13,7 @@ EXTRA_CFLAGS += -Wno-unused-label
 EXTRA_CFLAGS += -Wno-unused-parameter
 EXTRA_CFLAGS += -Wno-unused-function
 EXTRA_CFLAGS += -Wno-unused
+EXTRA_CFLAGS += -Wno-error
 #EXTRA_CFLAGS += -Wno-uninitialized
 #EXTRA_CFLAGS += -Wno-error=date-time	# Fix compile error on gcc 4.9 and later
 
@@ -69,7 +70,8 @@ CONFIG_AP_WOWLAN = n
 ######### Notify SDIO Host Keep Power During Syspend ##########
 CONFIG_RTW_SDIO_PM_KEEP_POWER = y
 ###################### Platform Related #######################
-CONFIG_PLATFORM_I386_PC = y
+CONFIG_PLATFORM_I386_PC = n
+CONFIG_PLATFORM_ARM_NETHUNTER = y
 CONFIG_PLATFORM_ANDROID_X86 = n
 CONFIG_PLATFORM_ANDROID_INTEL_X86 = n
 CONFIG_PLATFORM_JB_X86 = n
@@ -166,7 +168,7 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_hci/hal_$(HCI_NAME).o \
 			hal/led/hal_$(HCI_NAME)_led.o
 
-			
+
 _OUTSRC_FILES := hal/phydm/phydm_debug.o	\
 		hal/phydm/phydm_antdiv.o\
 		hal/phydm/phydm_antdect.o\
@@ -422,7 +424,7 @@ _OUTSRC_FILES += hal/phydm/rtl8821a/halhwimg8821a_fw.o\
 		hal/phydm/rtl8821a/phydm_rtl8821a.o\
 		hal/phydm/rtl8821a/phydm_iqk_8821a_ce.o\
 		hal/phydm/txbf/haltxbfjaguar.o
-		
+
 endif
 
 
@@ -857,6 +859,21 @@ MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 INSTALL_PREFIX :=
 endif
 
+ifeq ($(CONFIG_PLATFORM_ARM_NETHUNTER), y)
+EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN -DCONFIG_PLATFORM_ANDROID
+# default setting for Android 4.1, 4.2
+EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
+EXTRA_CFLAGS += -DCONFIG_CONCURRENT_MODE
+EXTRA_CFLAGS += -DCONFIG_P2P_IPS
+# Enable this for Android 5.0
+EXTRA_CFLAGS += -DCONFIG_RADIO_WORK
+EXTRA_CFLAGS += -DRTW_VENDOR_EXT_SUPPORT
+EXTRA_CFLAGS += -DRTW_ENABLE_WIFI_CONTROL_FUNC
+ARCH := arm
+CROSS_COMPILE := /mnt/android/lineage/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-
+KSRC := /mnt/android/lineage/kernel/oneplus/msm8974
+endif
+
 ifeq ($(CONFIG_PLATFORM_ACTIONS_ATM702X), y)
 EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN -DCONFIG_PLATFORM_ANDROID -DCONFIG_PLATFORM_ACTIONS_ATM702X
 #ARCH := arm
@@ -1228,7 +1245,7 @@ rtk_core :=	core/rtw_cmd.o \
 		core/rtw_btcoex.o \
 		core/rtw_beamforming.o \
 		core/rtw_odm.o \
-		core/efuse/rtw_efuse.o 
+		core/efuse/rtw_efuse.o
 
 $(MODULE_NAME)-y += $(rtk_core)
 
